@@ -1,13 +1,18 @@
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 
 public class Rover {
     private static final Pattern VALID_COMMANDS = Pattern.compile("^[MLR]+$");
-    private final Coordinates coordinates;
+    private Coordinates coordinates;
     private Rotatable<Heading> heading;
+
+    static Set<Coordinates> occupiedCoordinates = new HashSet<>();
 
     public Rover(Coordinates coordinates, Rotatable<Heading> heading) {
         this.coordinates = new Coordinates(coordinates);
+        occupiedCoordinates.add(this.coordinates);
         this.heading = heading;
     }
 
@@ -34,13 +39,23 @@ public class Rover {
     }
 
     private void moveForward() {
+        int newX = coordinates.getX();
+        int newY = coordinates.getY();
         switch (heading) {
-            case Heading.N -> coordinates.setY(coordinates.getY() + 1);
-            case Heading.E -> coordinates.setX(coordinates.getX() + 1);
-            case Heading.S -> coordinates.setY(coordinates.getY() - 1);
-            case Heading.W -> coordinates.setX(coordinates.getX() - 1);
+            case Heading.N -> newY += 1;
+            case Heading.E -> newX += 1;
+            case Heading.S -> newY -= 1;
+            case Heading.W -> newX -= 1;
             default -> throw new IllegalStateException("Unexpected value: " + heading);
         }
+        Coordinates newCoordinates = new Coordinates(newX, newY, coordinates.getMaxX(), coordinates.getMinX(),
+                coordinates.getMaxY(), coordinates.getMinY());
+        if (occupiedCoordinates.contains(newCoordinates)) {
+            throw new IllegalArgumentException("The following coordinates are already occupied: " + newCoordinates);
+        }
+        occupiedCoordinates.remove(coordinates);
+        occupiedCoordinates.add(newCoordinates);
+        coordinates = newCoordinates;
     }
 
     @Override

@@ -1,3 +1,6 @@
+import java.text.MessageFormat;
+import java.util.Objects;
+
 public class Coordinates {
     private int x;
     private int y;
@@ -31,6 +34,14 @@ public class Coordinates {
 
     public int getY() { return y; }
 
+    public int getMaxX() { return maxX; }
+
+    public int getMinX() { return minX; }
+
+    public int getMaxY() { return maxY; }
+
+    public int getMinY() { return minY; }
+
     void setY(int y) {
         if (y < minY || y > maxY) {
             throw new IllegalArgumentException(String.format("Invalid y-coordinate: %d (min=%d, max=%d)",
@@ -41,7 +52,19 @@ public class Coordinates {
 
     @Override
     public String toString() {
-        return "Coordinates{" + "x=" + x + ", y=" + y + ", maxX=" + maxX + ", minX=" + minX + ", maxY=" + maxY +
-                ", minY=" + minY + '}';
+        return MessageFormat.format("Coordinates'{'x={0}, y={1}'}'", x, y);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Coordinates that = (Coordinates) o;
+        return x == that.x && y == that.y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 }
